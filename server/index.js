@@ -11,7 +11,15 @@ const { MongoClient, ObjectId } = require("mongodb");
 const url = 'mongodb://localhost:27017/';
 const client = new MongoClient(url);
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
+// app.get('/uploads/:fileName', (req, res) => {
+//     const filePath = path.join(__dirname, 'uploads', req.params.fileName);
+//     res.download(filePath, (err) => {
+//         if (err) {
+//             console.error("Error downloading file", err);
+//             res.status(500).send("Error downloading file.");
+//         }
+//     });
+// });
 
 const DATABASE = 'assign';
 const COLLECTION = {
