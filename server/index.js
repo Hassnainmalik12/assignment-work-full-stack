@@ -3,14 +3,22 @@ const app = express();
 const formidable = require("formidable");
 const path = require("path");
 const fs = require("fs");
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const cors = require('cors');
 const { MongoClient, ObjectId } = require("mongodb");
 
 const url = 'mongodb://localhost:27017/';
 const client = new MongoClient(url);
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
 
 const DATABASE = 'assign';
-const COLLECTION = 'register_order';
+const COLLECTION = {
+    CONTACTUS:"contactus",
+    ORDERNOW:"ordernow",
+}
+// const COLLECTION = 'register_order';
 
 
 app.use(cors({
@@ -36,7 +44,7 @@ connectToDatabase();
 app.post('/contact-us-register', async (req, res) => {
     try {
         const db = client.db(DATABASE);
-        const col = db.collection(COLLECTION);
+        const col = db.collection(COLLECTION.CONTACTUS);
 
         const formData = req.body;
         const result = await col.insertOne(formData);
@@ -81,7 +89,7 @@ app.post("/register-order", (req, res) => {
 
         const sourcePath = files.avatar[0].filepath;
         const database = client.db(DATABASE);
-        const collection1 = database.collection(COLLECTION);
+        const collection1 = database.collection(COLLECTION.ORDERNOW);
         const result = await collection1.insertOne({
             paperTopic , paperType ,deadline,subject, noOfWords,educationLevel,reference,referenceStyle,
             name,email,country,contactNumber, details , image: originalFilename
@@ -115,6 +123,23 @@ app.post("/register-order", (req, res) => {
         })
 
     })
+});
+
+app.get('/view_messages', async (req, res) => {
+
+    const database = client.db(DATABASE);
+    const usersCollection = database.collection(COLLECTION.CONTACTUS);
+    const data = await usersCollection.find({}).toArray();
+    res.send({ data });
+
+});
+app.get('/view_orders', async (req, res) => {
+
+    const database = client.db(DATABASE);
+    const usersCollection = database.collection(COLLECTION.ORDERNOW);
+    const data = await usersCollection.find({}).toArray();
+    res.send({ data });
+
 });
 
 
